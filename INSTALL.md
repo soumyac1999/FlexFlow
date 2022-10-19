@@ -11,6 +11,7 @@ git clone --recursive https://github.com/flexflow/FlexFlow.git
 If you are planning to build the Python interface, you will need to install several additional Python libraries, please check [this](https://github.com/flexflow/FlexFlow/blob/master/requirements.txt) for details. If you are only looking to use the C++ interface, you can skip to the next section.
 
 **We recommend that you create your own `conda` environment and then install the Python dependencies, to avoid any version mismatching with your system pre-installed libraries.** 
+The conda `environment.yml` file is provided. You can use it to create the environment as `conda env create -f environment.yml`.
 
 ## 3. Configuring the FlexFlow build
 Before building FlexFlow, you should configure the build by editing the `config/config.linux` file. Leave it unchanged if you want to build with the default options. We recommend that you spend some time familiarizing with the available options. In particular, the main parameters are:
