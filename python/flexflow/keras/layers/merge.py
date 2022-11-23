@@ -41,7 +41,7 @@ class _Merge(Layer):
       for i in range (1, input_tensor.num_dims):
         if isinstance(self, Concatenate) and self.axis == i:
           continue
-        assert input_tensor.batch_shape[i] == self.input_shape[i]
+        assert input_tensor.batch_shape[i] == self.input_shape[i], f'{input_tensor.batch_shape}, {self.input_shape}'
     assert output_tensor.num_dims == len(self.output_shape), "[Merge]: check output tensor dims"
     for i in range (1, output_tensor.num_dims):
       assert output_tensor.batch_shape[i] == self.output_shape[i]
