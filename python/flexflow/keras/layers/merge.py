@@ -41,7 +41,8 @@ class _Merge(Layer):
       for i in range (1, input_tensor.num_dims):
         if isinstance(self, Concatenate) and self.axis == i:
           continue
-        assert input_tensor.batch_shape[i] == self.input_shape[i], f'{input_tensor.batch_shape}, {self.input_shape}'
+        # assert input_tensor.batch_shape[i] == self.input_shape[i], f'{input_tensor.batch_shape}, {self.input_shape}'
+        assert input_tensor.batch_shape[i] == self.input_shape[i] or input_tensor.batch_shape[i] == 1 or self.input_shape[i] == 1, f'{input_tensor.batch_shape}, {self.input_shape}'
     assert output_tensor.num_dims == len(self.output_shape), "[Merge]: check output tensor dims"
     for i in range (1, output_tensor.num_dims):
       assert output_tensor.batch_shape[i] == self.output_shape[i]
@@ -71,13 +72,18 @@ class Concatenate(_Merge):
       for input_tensor in input_tensors:
         output_shape[self.axis] += input_tensor.batch_shape[self.axis]
       self.output_shape = (output_shape[0], output_shape[1])
+    elif (input_tensors[0].num_dims == 3):
+      output_shape = [input_tensors[0].batch_shape[0], input_tensors[0].batch_shape[1], input_tensors[0].batch_shape[2]]
+      for input_tensor in input_tensors[1:]:
+        output_shape[self.axis] += input_tensor.batch_shape[self.axis]
+      self.output_shape = (output_shape[0], output_shape[1], output_shape[2])
     elif (input_tensors[0].num_dims == 4):
       output_shape = [input_tensors[0].batch_shape[0], 0, input_tensors[0].batch_shape[2], input_tensors[0].batch_shape[3]]
       for input_tensor in input_tensors:
         output_shape[self.axis] += input_tensor.batch_shape[self.axis]
       self.output_shape = (output_shape[0], output_shape[1], output_shape[2], output_shape[3])
     else:
-      assert 0, "un-supported dims"
+      assert 0, f"un-supported dims {input_tensors[0].num_dims}"
     fflogger.debug("concat output %s" %( str(self.output_shape)))
     self.input_shape = input_tensors[0].batch_shape
 

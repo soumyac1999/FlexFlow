@@ -2639,7 +2639,9 @@ void FFModel::compile(LossType loss_type,
     deserialize_graph_optimal_view(dez, best_graph, optimal_views);
     operators.clear();
     convert_graph_to_operators(best_graph, optimal_views);
+    fprintf(stdout, "######### Start printing task graph #########.\n");
     best_graph->print_dot();
+    fprintf(stdout, "######### End printing task graph #########.\n");
     delete best_graph;
     for (auto const &layer : layers) {
       // map inputs to parallel tensor

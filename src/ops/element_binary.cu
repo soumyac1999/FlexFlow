@@ -113,30 +113,45 @@ void ElementBinary::forward_kernel(ElementBinaryMeta const *m,
   // cudnn currently does not support broadcasting the first input in
   // cudnnOpTensor
   if (m->broadcast_input1) {
-    // currently only handle add and sub
-    assert(m->op_type == OP_EW_SUB || m->op_type == OP_EW_ADD);
-    checkCUDNN(cudnnOpTensor(m->handle.dnn,
-                             m->opDesc,
-                             &beta,
-                             m->outputTensor,
-                             out_ptr,
-                             &alpha1,
-                             m->input1Tensor,
-                             in1_ptr,
-                             &beta,
-                             m->outputTensor,
-                             out_ptr));
-    checkCUDNN(cudnnOpTensor(m->handle.dnn,
-                             m->opDesc,
-                             &beta,
-                             m->outputTensor,
-                             out_ptr,
-                             &alpha2,
-                             m->input2Tensor,
-                             in2_ptr,
-                             &alpha1,
-                             m->outputTensor,
-                             out_ptr));
+    if (m->op_type == OP_EW_SUB || m->op_type == OP_EW_ADD){
+      checkCUDNN(cudnnOpTensor(m->handle.dnn,
+                              m->opDesc,
+                              &beta,
+                              m->outputTensor,
+                              out_ptr,
+                              &alpha1,
+                              m->input1Tensor,
+                              in1_ptr,
+                              &beta,
+                              m->outputTensor,
+                              out_ptr));
+      checkCUDNN(cudnnOpTensor(m->handle.dnn,
+                              m->opDesc,
+                              &beta,
+                              m->outputTensor,
+                              out_ptr,
+                              &alpha2,
+                              m->input2Tensor,
+                              in2_ptr,
+                              &alpha1,
+                              m->outputTensor,
+                              out_ptr));
+    } else if (m->op_type == OP_EW_MUL){
+      checkCUDNN(cudnnOpTensor(m->handle.dnn,
+                               m->opDesc,
+                               &alpha1,
+                               m->input1Tensor,
+                               in1_ptr,
+                               &alpha2,
+                               m->input2Tensor,
+                               in2_ptr,
+                               &beta,
+                               m->outputTensor,
+                               out_ptr));
+    } else {
+      // currently only handle add and sub
+      assert(m->op_type == OP_EW_SUB || m->op_type == OP_EW_ADD);
+    }
   } else {
     checkCUDNN(cudnnOpTensor(m->handle.dnn,
                              m->opDesc,
