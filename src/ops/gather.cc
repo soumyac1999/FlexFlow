@@ -111,16 +111,26 @@ Op *Gather::create_operator_from_layer(
   long long value;
   layer->get_int_property("legion_dim", value);
   int legion_dim = value;
-  return new Gather(model, inputs[0], inputs[1], legion_dim, layer->name);
+  std::cout << "gather op " << (layer->layer_guid.id) << "\n";
+  Op* g = new Gather(
+      model, layer->layer_guid, inputs[0], inputs[1], legion_dim, layer->name);
+  std::cout << g->layer_guid.id << "\n";
+  return g;
 }
 
 Gather::Gather(FFModel &model,
                GatherParams const &params,
                std::pair<ParallelTensor, ParallelTensor> const &inputs,
                char const *name)
-    : Gather(model, inputs.first, inputs.second, params.legion_dim, name) {}
+    : Gather(model,
+             params.layer_guid,
+             inputs.first,
+             inputs.second,
+             params.legion_dim,
+             name) {}
 
 Gather::Gather(FFModel &model,
+               LayerID const &_layer_guid,
                const ParallelTensor input,
                const ParallelTensor index,
                int _legion_dim,
@@ -135,6 +145,7 @@ Gather::Gather(FFModel &model,
          input,
          index),
       legion_dim(_legion_dim) {
+  layer_guid = _layer_guid;
   // Assume that input and index have the same paralleldim except
   // for the legion_dim-th dim, which cannot be parallelized
   for (int i = 0; i < input->num_dims; i++) {
@@ -156,6 +167,7 @@ Gather::Gather(FFModel &model,
 void Gather::serialize(Legion::Serializer &sez) const {
   GatherParams params = get_params();
   sez.serialize(params.legion_dim);
+  sez.serialize(this->layer_guid.id);
 }
 
 using PCG::Node;
@@ -167,8 +179,13 @@ Node Gather::deserialize(FFModel &ff,
   assert(num_inputs == 2);
   int legion_dim;
   dez.deserialize(legion_dim);
+  size_t id;
+  dez.deserialize(id);
+  LayerID layer_guid(id);
+
   GatherParams params;
   params.legion_dim = legion_dim;
+  params.layer_guid = layer_guid;
   return ff.get_or_create_node<Gather>({inputs[0], inputs[1]}, params);
 }
 
