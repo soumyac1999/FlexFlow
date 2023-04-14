@@ -186,6 +186,7 @@ Node Gather::deserialize(FFModel &ff,
   GatherParams params;
   params.legion_dim = legion_dim;
   params.layer_guid = layer_guid;
+  std::cout << "gather deserialize " << params.layer_guid.id << "\n";
   return ff.get_or_create_node<Gather>({inputs[0], inputs[1]}, params);
 }
 
@@ -435,6 +436,7 @@ namespace std {
 size_t hash<FlexFlow::GatherParams>::operator()(
     FlexFlow::GatherParams const &params) const {
   size_t key = 0;
+  hash_combine(key, params.layer_guid.id);
   hash_combine(key, params.legion_dim);
   return key;
 }
