@@ -66,6 +66,7 @@ bool GatherParams::is_valid(
 GatherParams Gather::get_params() const {
   GatherParams params;
   params.legion_dim = this->legion_dim;
+  params.layer_guid = this->layer_guid;
   return params;
 }
 

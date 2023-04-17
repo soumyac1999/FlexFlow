@@ -2820,6 +2820,11 @@ void FFModel::compile(LossType loss_type,
             "data-parallel PCG.\n");
   }
   create_operators_from_layers();
+  for (auto const &op : operators) {
+    std::cout << "compile_1 op_guid " << (op->layer_guid.id) << " "
+              << (op->op_type) << "\n";
+  }
+
   // Launch the graph optimize task
   {
     FFModel *model = this;
@@ -2947,6 +2952,11 @@ void FFModel::compile(LossType loss_type,
       assert(op->outputs[i]->owner_idx == i);
       assert(op->outputs[i]->parallel_tensor_guid != 0);
     }
+  }
+
+  for (auto const &op : operators) {
+    std::cout << "compile_2 op_guid " << (op->layer_guid.id) << " "
+              << (op->op_type) << "\n";
   }
 
   // If an operator's input is training data
