@@ -112,10 +112,8 @@ Op *Gather::create_operator_from_layer(
   long long value;
   layer->get_int_property("legion_dim", value);
   int legion_dim = value;
-  std::cout << "gather op " << (layer->layer_guid.id) << "\n";
   Op* g = new Gather(
       model, layer->layer_guid, inputs[0], inputs[1], legion_dim, layer->name);
-  std::cout << g->layer_guid.id << "\n";
   return g;
 }
 
@@ -187,7 +185,6 @@ Node Gather::deserialize(FFModel &ff,
   GatherParams params;
   params.legion_dim = legion_dim;
   params.layer_guid = layer_guid;
-  std::cout << "gather deserialize " << params.layer_guid.id << "\n";
   return ff.get_or_create_node<Gather>({inputs[0], inputs[1]}, params);
 }
 
